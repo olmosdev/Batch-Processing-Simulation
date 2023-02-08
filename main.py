@@ -161,16 +161,22 @@ class MainWidow(Tk, CenterWidgetMixin):
 
             counter += 1
 
+        # Saving processes in memory
         with open("processes.txt", "w") as textFile:
+            batches = set() # To handle batch separation
+            
             for p in self.processes:
+                if p["BATCH"] not in batches:
+                    batches.add(p["BATCH"])
+                    textFile.write("BATCH: {}\n".format(p["BATCH"]))
+
                 for key, value in p.items():
-                    textFile.write(f"{key}: {value}")
-                    textFile.write("\n")
+                    if key != "BATCH":
+                        textFile.write(f"\t{key}: {value}\n")
                 textFile.write("\n")
 
         # Starting the timer
         initialTime = time.time() 
-        #self.Timer(initialTime)
         # Creating thread of execution to work with parallel programming
         self.timerStatus = True
         self.threadingTimer = threading.Thread(target=self.Timer, args=(initialTime,))
@@ -306,12 +312,17 @@ class MainWidow(Tk, CenterWidgetMixin):
         self.executionText.config(state=DISABLED)
 
     def SaveProcessResult(self):
-        with open("processResult.txt", "w") as textFile:
+        with open("processesResult.txt", "w") as textFile:
+            batches = set() # To handle batch separation
+            
             for p in self.processes:
-                textFile.write(F"BATCH: {p['BATCH']}\n")
-                textFile.write(F"ID: {p['ID']}\n")
-                textFile.write(F"PROGRAMMER: {p['PROGRAMMER']}\n")
-                textFile.write(F"OPERATION: {p['OPERATION']}\n")
+                if p["BATCH"] not in batches:
+                    batches.add(p["BATCH"])
+                    textFile.write("BATCH: {}\n".format(p["BATCH"]))
+
+                for key, value in p.items():
+                    if key != "BATCH" and key != "TIME":
+                        textFile.write(f"\t{key}: {value}\n")
                 textFile.write("\n")
         MessageBox.showinfo("RESULTS", "The results have already been written.")
 
